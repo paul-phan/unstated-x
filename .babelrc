@@ -1,0 +1,16 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "modules": false,
+        "loose": true
+      }
+    ],
+    "react",
+    "flow"
+  ],
+  "plugins": [
+    "transform-class-properties"
+  ]
+}
