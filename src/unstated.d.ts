@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 export class Container<State extends object> {
+  constructor(state?: object);
   state: State;
   setState<K extends keyof State>(
     state:
