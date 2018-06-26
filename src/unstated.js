@@ -15,9 +15,26 @@ export class Container<State: {}> {
     state && (this.state = state);
   }
 
-  setStateSync(state: $Shape<State>) {
-    this.state = Object.assign({}, this.state, state);
-    this._listeners.forEach(fn => fn(state));
+  setStateSync(
+    updater: $Shape<State> | ((prevState: $Shape<State>) => $Shape<State>),
+    callback?: () => void
+  ) {
+    let nextState;
+
+    if (typeof updater === 'function') {
+      nextState = updater(this.state);
+    } else {
+      nextState = updater;
+    }
+
+    if (nextState == null) {
+      if (callback) callback();
+      return;
+    }
+
+    this.state = Object.assign({}, this.state, nextState);
+
+    this._listeners.forEach(fn => fn(nextState));
   }
 
   setState(

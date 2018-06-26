@@ -6,7 +6,8 @@ export class Container<State extends object> {
     setStateSync<K extends keyof State>(
         state:
             | ((prevState: Readonly<State>) => Partial<State> | State | null)
-            | (Partial<State> | State | null)
+            | (Partial<State> | State | null),
+        callback?: () => void
     ): void;
     setState<K extends keyof State>(
         state:
