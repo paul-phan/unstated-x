@@ -55,6 +55,6 @@ You can checkout the example to see more.
 
 > In this version, if you use React version 16.3 or higher, it will use the native React.createContext rather than the `create-react-context` library. I also removed support for multiple `<Provider />` it clearly unnecessary.
 
-
 ## Contribution
+
 Feel free to create issues/pull request, I will eager to apply it to unstated-x if it good enough :)
