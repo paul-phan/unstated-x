@@ -1,6 +1,6 @@
 {
   "name": "unstated-x",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Add more powers to unstated",
   "main": "lib/unstated.js",
   "module": "lib/unstated.es.js",
