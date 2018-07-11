@@ -3,6 +3,7 @@ import * as React from 'react';
 export class Container<State extends object> {
     constructor(state?: object);
     state: State;
+    _listeners: [Function];
     setStateSync<K extends keyof State>(
         state:
             | ((prevState: Readonly<State>) => Partial<State> | State | null)
@@ -15,8 +16,8 @@ export class Container<State extends object> {
             | (Partial<State> | State | null),
         callback?: () => void
     ): Promise<void>;
-    subscribe(fn: () => any): void;
-    unsubscribe(fn: () => any): void;
+    subscribe(fn: (changes: {}) => any): void;
+    unsubscribe(fn: (changes: {}) => any): void;
 }
 
 export interface ContainerType<State extends object> {
@@ -27,9 +28,14 @@ interface SubscribeProps {
     to: (ContainerType<any> | Container<any>)[];
     children(...instances: Container<any>[]): React.ReactNode;
 }
+interface SubscribeOneProps {
+    to: (ContainerType<any> | Container<any>);
+    bind: string[];
+    children(...instances: Container<any>[]): React.ReactNode;
+}
 
 export class Subscribe extends React.Component<SubscribeProps> {}
-export class SubscribeOne extends React.Component<SubscribeProps> {}
+export class SubscribeOne extends React.Component<SubscribeOneProps> {}
 
 export interface ProviderProps {
     inject?: Container<any>[];
