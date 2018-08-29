@@ -1,16 +1,16 @@
 {
   "presets": [
     [
-      "env",
+      "@babel/preset-env",
       {
         "modules": false,
         "loose": true
       }
     ],
-    "react",
-    "flow"
+    "@babel/preset-react",
+    "@babel/preset-flow"
   ],
   "plugins": [
-    "transform-class-properties"
+    "@babel/plugin-proposal-class-properties"
   ]
 }
