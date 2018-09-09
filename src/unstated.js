@@ -9,9 +9,8 @@ export class Container<State: {}> {
   state: State;
   _listeners: Array<Listener> = [];
 
-  constructor(state?: object) {
-    // eslint-disable-next-line no-unused-expressions
-    state && (this.state = state);
+  constructor(state: object = {}) {
+    this.state = state;
   }
 
   setStateSync(
