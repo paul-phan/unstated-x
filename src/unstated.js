@@ -1,22 +1,16 @@
-// @flow
-import React, { type Node, createContext } from 'react';
-
-type Listener = () => mixed;
+import React, { createContext } from 'react';
 
 export const StateContext = createContext(null);
 
-export class Container<State: {}> {
-  state: State;
-  _listeners: Array<Listener> = [];
+export class Container {
+  state = {};
+  _listeners = [];
 
-  constructor(state: object = {}) {
+  constructor(state = {}) {
     this.state = state;
   }
 
-  setStateSync(
-    updater: $Shape<State> | ((prevState: $Shape<State>) => $Shape<State>),
-    callback?: () => void
-  ) {
+  _setState = (updater, callback) => {
     let nextState;
 
     if (typeof updater === 'function') {
@@ -27,31 +21,21 @@ export class Container<State: {}> {
 
     if (nextState == null) {
       if (callback) callback();
-      return;
     }
+    return nextState;
+  };
+
+  setStateSync = (updater, callback) => {
+    const nextState = this._setState(updater, callback);
 
     this.state = Object.assign({}, this.state, nextState);
 
     this._listeners.forEach(fn => fn(nextState));
-  }
+  };
 
-  setState(
-    updater: $Shape<State> | ((prevState: $Shape<State>) => $Shape<State>),
-    callback?: () => void
-  ): Promise<void> {
+  setState = (updater, callback) => {
     return Promise.resolve().then(() => {
-      let nextState;
-
-      if (typeof updater === 'function') {
-        nextState = updater(this.state);
-      } else {
-        nextState = updater;
-      }
-
-      if (nextState == null) {
-        if (callback) callback();
-        return;
-      }
+      const nextState = this._setState(updater, callback);
 
       this.state = Object.assign({}, this.state, nextState);
 
@@ -63,38 +47,22 @@ export class Container<State: {}> {
         }
       });
     });
-  }
+  };
 
-  subscribe(fn: Listener) {
+  subscribe(fn) {
     this._listeners.push(fn);
   }
 
-  unsubscribe(fn: Listener) {
+  unsubscribe(fn) {
     this._listeners = this._listeners.filter(f => f !== fn);
   }
 }
 
-export type ContainerType = Container<Object>;
-export type ContainersType = Array<Class<ContainerType> | ContainerType>;
-export type ContainerMapType = Map<Class<ContainerType>, ContainerType>;
-
-export type SubscribeProps<Containers: ContainersType> = {
-  to: Containers,
-  children: (
-    ...instances: $TupleMap<Containers, <C>(Class<C> | C) => C>
-  ) => Node
-};
-
-type SubscribeState = {};
-
 const DUMMY_STATE = {};
 
-export class Subscribe<Containers: ContainersType> extends React.Component<
-  SubscribeProps<Containers>,
-  SubscribeState
-> {
+export class Subscribe extends React.Component {
   state = {};
-  instances: Array<ContainerType> = [];
+  instances = [];
   unmounted = false;
 
   componentWillUnmount() {
@@ -108,7 +76,7 @@ export class Subscribe<Containers: ContainersType> extends React.Component<
     });
   }
 
-  onUpdate: Listener = () => {
+  onUpdate = () => {
     return new Promise(resolve => {
       if (!this.unmounted) {
         this.setState(DUMMY_STATE, resolve);
@@ -118,10 +86,7 @@ export class Subscribe<Containers: ContainersType> extends React.Component<
     });
   };
 
-  _createInstances(
-    map: ContainerMapType | null,
-    containers: ContainersType
-  ): Array<ContainerType> {
+  _createInstances(map, containers) {
     this._unsubscribe();
 
     if (map === null) {
@@ -187,7 +152,7 @@ export class SubscribeOne extends React.Component {
     this.instance && this.instance.unsubscribe(this.onUpdate);
   }
 
-  onUpdate: Listener = changedState => {
+  onUpdate = changedState => {
     return new Promise(resolve => {
       if (
         !this.unmounted &&
@@ -236,20 +201,9 @@ export class SubscribeOne extends React.Component {
   }
 }
 
-export type ProviderProps = {
-  inject?: Array<ContainerType>,
-  children: Node
-};
-
-export function Provider(props: ProviderProps) {
-  const childMap = new Map();
-  if (props.inject) {
-    props.inject.forEach(instance => {
-      childMap.set(instance.constructor, instance);
-    });
-  }
+export function Provider(props) {
   return (
-    <StateContext.Provider value={childMap}>
+    <StateContext.Provider value={new Map()}>
       {props.children}
     </StateContext.Provider>
   );
