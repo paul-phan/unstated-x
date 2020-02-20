@@ -10,7 +10,7 @@ export class Container {
     this.state = state;
   }
 
-  _setState = (updater, callback) => {
+  _setState(updater, callback) {
     let nextState;
 
     if (typeof updater === 'function') {
@@ -23,17 +23,17 @@ export class Container {
       if (callback) callback();
     }
     return nextState;
-  };
+  }
 
-  setStateSync = (updater, callback) => {
+  setStateSync(updater, callback) {
     const nextState = this._setState(updater, callback);
 
     this.state = Object.assign({}, this.state, nextState);
 
     this._listeners.forEach(fn => fn(nextState));
-  };
+  }
 
-  setState = (updater, callback) => {
+  setState(updater, callback) {
     return Promise.resolve().then(() => {
       const nextState = this._setState(updater, callback);
 
@@ -47,7 +47,7 @@ export class Container {
         }
       });
     });
-  };
+  }
 
   subscribe(fn) {
     this._listeners.push(fn);
@@ -57,8 +57,6 @@ export class Container {
     this._listeners = this._listeners.filter(f => f !== fn);
   }
 }
-
-const DUMMY_STATE = {};
 
 export class Subscribe extends React.Component {
   state = {};
@@ -79,7 +77,7 @@ export class Subscribe extends React.Component {
   onUpdate = () => {
     return new Promise(resolve => {
       if (!this.unmounted) {
-        this.setState(DUMMY_STATE, resolve);
+        this.setState({}, resolve);
       } else {
         resolve();
       }
@@ -160,7 +158,7 @@ export class SubscribeOne extends React.Component {
         Object.keys(changedState).filter(key => this.props.bind.includes(key))
           .length > 0
       ) {
-        this.setState(DUMMY_STATE, resolve);
+        this.setState({}, resolve);
       } else {
         resolve();
       }
