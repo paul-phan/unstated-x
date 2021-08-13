@@ -1,3 +1,6 @@
+# This project will not be maintained anymore in favor of Hooks: https://github.com/paul-phan/global-state-hook
+
+
 # Unstated-x
 
 > State so simple, it goes without saying
